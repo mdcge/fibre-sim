@@ -22,6 +22,24 @@ impl Simulation {
     }
 }
 
+// Render
+impl Simulation {
+    fn render(&self, app: &App, frame: Frame, scale: f32) {
+        let draw = app.draw();
+        draw.background().color(BLACK);
+
+        for node in &self.nodes {
+            draw.ellipse()
+                .color(WHITE)
+                .w(10.0)
+                .h(10.0)
+                .x_y(node.r[0]*scale, node.r[1]*scale);
+        }
+
+        draw.to_frame(app, &frame).unwrap();
+    }
+}
+
 fn model(_app: &App) -> Simulation {
     Simulation::new(vec![Node::new(vec![-1.0, 0.0], 1.0), Node::new(vec![0.0, 0.0], 1.0), Node::new(vec![1.0, 0.0], 1.0)], 1.0, 0.0)
 }
@@ -30,7 +48,6 @@ fn model(_app: &App) -> Simulation {
 // Basically, it's a 60Hz update function.
 fn update(_app: &App, _simulation: &mut Simulation, _update: Update) {}
 
-fn view(app: &App, _simulation: &Simulation, _frame: Frame) {
-    let draw = app.draw();
-    draw.background().color(BLACK);
+fn view(app: &App, simulation: &Simulation, frame: Frame) {
+    simulation.render(&app, frame, 100.0);
 }

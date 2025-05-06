@@ -1,6 +1,6 @@
 pub struct Node {
-    r: Vec<f32>,
-    m: f32,
+    pub r: Vec<f32>,
+    pub m: f32,
 }
 
 impl Node {
