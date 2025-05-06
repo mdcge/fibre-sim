@@ -15,6 +15,7 @@ struct Simulation {
     k: f32,  // total spring constant (N/m)
     x0: f32,  // rest length of springs (m)
     g: f32,  // gravity (m/s^2)
+    c: f32,  // damping coefficient
     dt: f32,  // time step size (s)
     subdiv: usize,  // number of subdivisions (1 segment = 1 subdivision)
     dn: f32,  // display size for nodes
@@ -23,18 +24,18 @@ struct Simulation {
 
 // Initialize
 impl Simulation {
-    fn new(node_list: Vec<Node>, spring_constant: f32, rest_length: f32, grav: f32, timestep: f32, node_diameter: f32, spring_thickness: f32) -> Simulation {
+    fn new(node_list: Vec<Node>, spring_constant: f32, rest_length: f32, grav: f32, damping: f32, timestep: f32, node_diameter: f32, spring_thickness: f32) -> Simulation {
         let s = node_list.len() - 1;
-        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, dt: timestep, subdiv: s, dn: node_diameter, ds: spring_thickness }
+        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, subdiv: s, dn: node_diameter, ds: spring_thickness }
     }
 
-    fn new_straight(x_endpoints: Vec<f32>, spring_constant: f32, rest_length: f32, grav: f32, timestep: f32, node_diameter: f32, spring_thickness: f32, mass: f32, subd: usize) -> Simulation {
+    fn new_straight(x_endpoints: Vec<f32>, spring_constant: f32, rest_length: f32, grav: f32, damping: f32, timestep: f32, node_diameter: f32, spring_thickness: f32, mass: f32, subd: usize) -> Simulation {
         let mut node_list = vec![];
         for i in 0..subd+1 {
             let x_pos = x_endpoints[0] + i as f32 * (x_endpoints[1] - x_endpoints[0]) / subd as  f32;
             node_list.push(Node::new(vec![x_pos, 0.0], vec![0.0, 0.0], mass/subd as f32));
         }
-        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, dt: timestep, subdiv: subd, dn: node_diameter, ds: spring_thickness }
+        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, subdiv: subd, dn: node_diameter, ds: spring_thickness }
     }
 }
 
@@ -43,7 +44,7 @@ impl Simulation {
     fn step(&mut self) {
         let mut new_node_list = self.nodes.clone();
         for i in 1..self.nodes.len()-1 {
-            new_node_list[i] = self.nodes[i].updated_node(&self.nodes[i-1], &self.nodes[i+1], self.g, self.k/self.subdiv as f32, self.x0, self.dt);
+            new_node_list[i] = self.nodes[i].updated_node(&self.nodes[i-1], &self.nodes[i+1], self.g, self.k*self.subdiv as f32, self.x0, self.c, self.dt);
         }
         self.nodes = new_node_list;
     }
@@ -73,7 +74,7 @@ impl Simulation {
 
 fn model(_app: &App) -> Simulation {
     // Simulation::new(vec![Node::new(vec![-1.0, 0.0], 1.0), Node::new(vec![0.0, 0.0], 1.0), Node::new(vec![1.0, 0.0], 1.0)], 1.0, 0.0, 20.0, 8.0)
-    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 0.0, 9.81, 0.01, 10.0, 2.0, 0.004, 5)
+    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 4.0/20.0, 9.81, 0.01, 0.01, 10.0, 2.0, 0.04, 20)
 }
 
 // `update` is like `event` except that the only event it triggers on is clock ticks
