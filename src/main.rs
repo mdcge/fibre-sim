@@ -29,7 +29,7 @@ impl Simulation {
         let mut node_list = vec![];
         for i in 0..subd+1 {
             let x_pos = x_endpoints[0] + i as f32 * (x_endpoints[1] - x_endpoints[0]) / subd as  f32;
-            node_list.push(Node::new(vec![x_pos, 0.0], mass/subd as f32));
+            node_list.push(Node::new(vec![x_pos, 0.0], vec![0.0, 0.0], mass/subd as f32));
         }
         Simulation { nodes: node_list, k: spring_constant, x0: rest_length, subdiv: subd, dn: node_diameter, ds: spring_thickness }
     }
