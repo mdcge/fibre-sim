@@ -38,6 +38,17 @@ impl Simulation {
     }
 }
 
+// Step
+impl Simulation {
+    fn step(&mut self) {
+        let mut new_node_list = self.nodes.clone();
+        for i in 1..self.nodes.len()-1 {
+            new_node_list[i] = self.nodes[i].updated_node(&self.nodes[i-1], &self.nodes[i+1], self.g, self.k/self.subdiv as f32, self.x0, self.dt);
+        }
+        self.nodes = new_node_list;
+    }
+}
+
 // Render
 impl Simulation {
     fn render(&self, draw: &Draw, scale: f32) {
@@ -62,12 +73,14 @@ impl Simulation {
 
 fn model(_app: &App) -> Simulation {
     // Simulation::new(vec![Node::new(vec![-1.0, 0.0], 1.0), Node::new(vec![0.0, 0.0], 1.0), Node::new(vec![1.0, 0.0], 1.0)], 1.0, 0.0, 20.0, 8.0)
-    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 0.0, 9.81, 0.01, 10.0, 2.0, 0.004, 10)
+    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 0.0, 9.81, 0.01, 10.0, 2.0, 0.004, 5)
 }
 
 // `update` is like `event` except that the only event it triggers on is clock ticks
 // Basically, it's a 60Hz update function.
-fn update(_app: &App, _simulation: &mut Simulation, _update: Update) {}
+fn update(_app: &App, simulation: &mut Simulation, _update: Update) {
+    simulation.step();
+}
 
 fn view(app: &App, simulation: &Simulation, frame: Frame) {
     let win = app.window_rect();
