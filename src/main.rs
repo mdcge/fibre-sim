@@ -24,6 +24,15 @@ impl Simulation {
         let s = node_list.len() - 1;
         Simulation { nodes: node_list, k: spring_constant, x0: rest_length, subdiv: s, dn: node_diameter, ds: spring_thickness }
     }
+
+    fn new_straight(x_endpoints: Vec<f32>, spring_constant: f32, rest_length: f32, node_diameter: f32, spring_thickness: f32, mass: f32, subd: usize) -> Simulation {
+        let mut node_list = vec![];
+        for i in 0..subd+1 {
+            let x_pos = x_endpoints[0] + i as f32 * (x_endpoints[1] - x_endpoints[0]) / subd as  f32;
+            node_list.push(Node::new(vec![x_pos, 0.0], mass/subd as f32));
+        }
+        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, subdiv: subd, dn: node_diameter, ds: spring_thickness }
+    }
 }
 
 // Render
@@ -49,7 +58,8 @@ impl Simulation {
 }
 
 fn model(_app: &App) -> Simulation {
-    Simulation::new(vec![Node::new(vec![-1.0, 0.0], 1.0), Node::new(vec![0.0, 0.0], 1.0), Node::new(vec![1.0, 0.0], 1.0)], 1.0, 0.0, 20.0, 8.0)
+    // Simulation::new(vec![Node::new(vec![-1.0, 0.0], 1.0), Node::new(vec![0.0, 0.0], 1.0), Node::new(vec![1.0, 0.0], 1.0)], 1.0, 0.0, 20.0, 8.0)
+    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 0.0, 10.0, 2.0, 0.004, 10)
 }
 
 // `update` is like `event` except that the only event it triggers on is clock ticks
