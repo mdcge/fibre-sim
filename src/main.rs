@@ -14,13 +14,15 @@ struct Simulation {
     nodes: Vec<Node>,
     k: f32,  // total spring constant
     x0: f32,  // rest length of springs
+    subdiv: usize,  // number of subdivisions (1 segment = 1 subdivision)
     dn: f32,  // display size for nodes
     ds: f32,  // display size for springs
 }
 
 impl Simulation {
     fn new(node_list: Vec<Node>, spring_constant: f32, rest_length: f32, node_diameter: f32, spring_thickness: f32) -> Simulation {
-        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, dn: node_diameter, ds: spring_thickness }
+        let s = node_list.len() - 1;
+        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, subdiv: s, dn: node_diameter, ds: spring_thickness }
     }
 }
 
