@@ -26,8 +26,7 @@ impl Simulation {
 
 // Render
 impl Simulation {
-    fn render(&self, app: &App, frame: Frame, scale: f32) {
-        let draw = app.draw();
+    fn render(&self, draw: &Draw, scale: f32) {
         draw.background().color(BLACK);
 
         for (i, node) in self.nodes.iter().enumerate() {
@@ -44,8 +43,6 @@ impl Simulation {
                     .weight(self.ds);
             }
         }
-
-        draw.to_frame(app, &frame).unwrap();
     }
 }
 
@@ -58,5 +55,14 @@ fn model(_app: &App) -> Simulation {
 fn update(_app: &App, _simulation: &mut Simulation, _update: Update) {}
 
 fn view(app: &App, simulation: &Simulation, frame: Frame) {
-    simulation.render(&app, frame, 100.0);
+    let win = app.window_rect();
+    let draw = app.draw();
+
+    simulation.render(&draw, 100.0);
+
+    draw.text(&format!("{:.2} fps", app.fps()).to_string())
+        .font_size(15)
+        .x_y(-win.wh()[0]/2.0 + 35.0, win.wh()[1]/2.0 - 10.0);
+
+    draw.to_frame(app, &frame).unwrap();
 }
