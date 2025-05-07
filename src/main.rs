@@ -110,5 +110,10 @@ fn view(app: &App, simulation: &Simulation, frame: Frame) {
         .font_size(15)
         .x_y(-win.wh()[0]/2.0 + 35.0, win.wh()[1]/2.0 - 10.0);
 
+    draw.text(&format!("Sag = {:.3} mm", simulation.get_lowest_point()*1000.0).to_string())
+        .font_size(30)
+        .width(win.wh()[0])
+        .x_y(0.0, win.wh()[1]/2.0 - 50.0);
+
     draw.to_frame(app, &frame).unwrap();
 }
