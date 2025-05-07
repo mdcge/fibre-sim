@@ -38,7 +38,7 @@ impl Simulation {
         let mut node_list = vec![];
         for i in 0..subd+1 {
             let x_pos = x_endpoints[0] + i as f32 * (x_endpoints[1] - x_endpoints[0]) / subd as  f32;
-            node_list.push(Node::new(vec![x_pos, 0.0], vec![0.0, 0.0], mass/(subd as f32 + 1.0)));
+            node_list.push(Node::new(Vec2 { x: x_pos, y: 0.0 }, Vec2 { x: 0.0, y: 0.0 }, mass/(subd as f32 + 1.0)));
         }
         Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, subdiv: subd, dn: node_diameter, ds: spring_thickness, s: scale }
     }
@@ -65,12 +65,12 @@ impl Simulation {
                 .color(WHITE)
                 .w(self.dn)
                 .h(self.dn)
-                .x_y(node.r[0]*scale, node.r[1]*scale);
+                .x_y(node.r.x*scale, node.r.y*scale);
             if i != (self.nodes.len() - 1) {
                 draw.line()
                     .color(WHITE)
-                    .start(pt2(self.nodes[i].r[0]*scale, self.nodes[i].r[1]*scale))
-                    .end(pt2(self.nodes[i+1].r[0]*scale, self.nodes[i+1].r[1]*scale))
+                    .start(pt2(self.nodes[i].r.x*scale, self.nodes[i].r.y*scale))
+                    .end(pt2(self.nodes[i+1].r.x*scale, self.nodes[i+1].r.y*scale))
                     .weight(self.ds);
             }
         }
@@ -79,8 +79,8 @@ impl Simulation {
 
 fn model(_app: &App) -> Simulation {
     // Simulation::new(vec![Node::new(vec![-1.0, 0.0], 1.0), Node::new(vec![0.0, 0.0], 1.0), Node::new(vec![1.0, 0.0], 1.0)], 1.0, 0.0, 20.0, 8.0)
-    //                             x_endpoints       k     g       c    dt    dn    ds   s     m   sub
-    Simulation::new_straight(vec![-2000.0, 2000.0], 0.6, 9810.0, 0.01, 0.01, 10.0, 2.0, 0.1, 0.04, 20)
+    //                         x_endpoints     k     g    c     dt    dn    ds    s      m   sub
+    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 9.81, 0.01, 0.01, 10.0, 2.0, 200.0, 0.04, 10)
 }
 
 // `update` is like `event` except that the only event it triggers on is clock ticks
