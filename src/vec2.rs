@@ -13,6 +13,18 @@ impl Vec2 {
     pub fn mag(&self) -> f32 {
         (self.x.powf(2.0) + self.y.powf(2.0)).sqrt()
     }
+
+    pub fn unit(&self) -> Self {
+        let mag = self.mag();
+        let unit_vec = match mag {
+            0.0 => Vec2 { x: 0.0, y: 0.0 },
+            _ => *self / mag,
+        };
+        unit_vec
+    }
+}
+
+
 impl Add<Vec2> for Vec2 {
     type Output = Self;
     fn add(self, rhs: Vec2) -> Self {
