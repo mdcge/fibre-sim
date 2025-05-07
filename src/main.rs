@@ -53,6 +53,15 @@ impl Simulation {
         }
         self.nodes = new_node_list;
     }
+
+    fn get_lowest_point(&self) -> f32 {
+        self.nodes
+            .iter()
+            .map(|x| x.r.y)
+            .collect::<Vec<f32>>()
+            .iter()
+            .fold(f32::INFINITY, |this, that| f32::min(this, *that))
+    }
 }
 
 // Render
@@ -78,8 +87,8 @@ impl Simulation {
 }
 
 fn model(_app: &App) -> Simulation {
-    //                         x_endpoints     k     g      c        dt    dn    ds    s      m   sub
-    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 9.81, 0.0001, 0.00001, 10.0, 2.0, 200.0, 0.004, 50)
+    //                         x_endpoints      k       g      c       dt      dn    ds    s      m   sub
+    Simulation::new_straight(vec![-2.0, 2.0], 5367.0, 9.81, 0.0001, 0.000001, 10.0, 2.0, 400.0, 0.004, 100)
 }
 
 // `update` is like `event` except that the only event it triggers on is clock ticks
