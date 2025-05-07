@@ -1,5 +1,8 @@
 use nannou::prelude::*;
 
+mod vec2;
+use vec2::Vec2;
+
 mod node;
 use node::Node;
 
