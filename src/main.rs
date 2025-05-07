@@ -110,7 +110,8 @@ fn view(app: &App, simulation: &Simulation, frame: Frame) {
         .font_size(15)
         .x_y(-win.wh()[0]/2.0 + 35.0, win.wh()[1]/2.0 - 10.0);
 
-    draw.text(&format!("Sag = {:.3} mm", simulation.get_lowest_point()*1000.0).to_string())
+    let low_point = simulation.get_lowest_point() * 1000.0; // mm
+    draw.text(&format!("Sag = {:.0} {:0>3.0} {:0>3.0} nm", low_point - (low_point % 1.0), ((low_point*1000.0) % 1000.0).abs(), (low_point*1000000.0 % 1000.0).abs()).to_string())
         .font_size(30)
         .width(win.wh()[0])
         .x_y(0.0, win.wh()[1]/2.0 - 50.0);
