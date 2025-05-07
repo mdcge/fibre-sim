@@ -78,15 +78,17 @@ impl Simulation {
 }
 
 fn model(_app: &App) -> Simulation {
-    // Simulation::new(vec![Node::new(vec![-1.0, 0.0], 1.0), Node::new(vec![0.0, 0.0], 1.0), Node::new(vec![1.0, 0.0], 1.0)], 1.0, 0.0, 20.0, 8.0)
-    //                         x_endpoints     k     g    c     dt    dn    ds    s      m   sub
-    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 9.81, 0.01, 0.01, 10.0, 2.0, 200.0, 0.04, 10)
+    //                         x_endpoints     k     g      c        dt    dn    ds    s      m   sub
+    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 9.81, 0.0001, 0.00001, 10.0, 2.0, 200.0, 0.004, 50)
 }
 
 // `update` is like `event` except that the only event it triggers on is clock ticks
 // Basically, it's a 60Hz update function.
 fn update(_app: &App, simulation: &mut Simulation, _update: Update) {
-    simulation.step();
+    let steps_per_frame = (1.0 / 60.0 / simulation.dt) as usize;
+    for _ in 0..steps_per_frame {
+        simulation.step();
+    }
 }
 
 fn view(app: &App, simulation: &Simulation, frame: Frame) {
