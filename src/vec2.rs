@@ -1,8 +1,9 @@
-use std::ops::{Mul, Add, Neg, Div};
+use std::ops::{Mul, Add, Neg, Div, Sub};
 
+#[derive(Copy, Clone, Debug)]
 pub struct Vec2 {
-    x: f32,
-    y: f32
+    pub x: f32,
+    pub y: f32
 }
 
 impl Vec2 {
