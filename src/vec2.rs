@@ -20,6 +20,13 @@ impl Add<Vec2> for Vec2 {
     }
 }
 
+impl Sub<Vec2> for Vec2 {
+    type Output = Self;
+    fn sub(self, rhs: Vec2) -> Self {
+        Vec2 { x: self.x-rhs.x, y: self.y-rhs.y }
+    }
+}
+
 impl Neg for Vec2 {
     type Output = Self;
     fn neg(self) -> Self {
