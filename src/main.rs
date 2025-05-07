@@ -20,23 +20,24 @@ struct Simulation {
     subdiv: usize,  // number of subdivisions (1 segment = 1 subdivision)
     dn: f32,  // display size for nodes
     ds: f32,  // display size for springs
+    s: f32,  // display scale
 }
 
 // Initialize
 impl Simulation {
-    fn new(node_list: Vec<Node>, spring_constant: f32, rest_length: f32, grav: f32, damping: f32, timestep: f32, node_diameter: f32, spring_thickness: f32) -> Simulation {
+    fn new(node_list: Vec<Node>, spring_constant: f32, rest_length: f32, grav: f32, damping: f32, timestep: f32, node_diameter: f32, spring_thickness: f32, scale: f32) -> Simulation {
         let s = node_list.len() - 1;
-        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, subdiv: s, dn: node_diameter, ds: spring_thickness }
+        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, subdiv: s, dn: node_diameter, ds: spring_thickness, s: scale }
     }
 
-    fn new_straight(x_endpoints: Vec<f32>, spring_constant: f32, grav: f32, damping: f32, timestep: f32, node_diameter: f32, spring_thickness: f32, mass: f32, subd: usize) -> Simulation {
+    fn new_straight(x_endpoints: Vec<f32>, spring_constant: f32, grav: f32, damping: f32, timestep: f32, node_diameter: f32, spring_thickness: f32, scale: f32, mass: f32, subd: usize) -> Simulation {
         let rest_length = (x_endpoints[1] - x_endpoints[0]) / subd as f32;
         let mut node_list = vec![];
         for i in 0..subd+1 {
             let x_pos = x_endpoints[0] + i as f32 * (x_endpoints[1] - x_endpoints[0]) / subd as  f32;
             node_list.push(Node::new(vec![x_pos, 0.0], vec![0.0, 0.0], mass/(subd as f32 + 1.0)));
         }
-        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, subdiv: subd, dn: node_diameter, ds: spring_thickness }
+        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, subdiv: subd, dn: node_diameter, ds: spring_thickness, s: scale }
     }
 }
 
@@ -75,7 +76,8 @@ impl Simulation {
 
 fn model(_app: &App) -> Simulation {
     // Simulation::new(vec![Node::new(vec![-1.0, 0.0], 1.0), Node::new(vec![0.0, 0.0], 1.0), Node::new(vec![1.0, 0.0], 1.0)], 1.0, 0.0, 20.0, 8.0)
-    Simulation::new_straight(vec![-2.0, 2.0], 1.0, 9.81, 0.01, 0.01, 10.0, 2.0, 0.04, 30)
+    //                             x_endpoints       k     g       c    dt    dn    ds   s     m   sub
+    Simulation::new_straight(vec![-2000.0, 2000.0], 0.6, 9810.0, 0.01, 0.01, 10.0, 2.0, 0.1, 0.04, 20)
 }
 
 // `update` is like `event` except that the only event it triggers on is clock ticks
@@ -88,7 +90,7 @@ fn view(app: &App, simulation: &Simulation, frame: Frame) {
     let win = app.window_rect();
     let draw = app.draw();
 
-    simulation.render(&draw, 100.0);
+    simulation.render(&draw, simulation.s);
 
     draw.text(&format!("{:.2} fps", app.fps()).to_string())
         .font_size(15)
