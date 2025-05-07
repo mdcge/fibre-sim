@@ -16,7 +16,7 @@ impl Vec2 {
 impl Add<Vec2> for Vec2 {
     type Output = Self;
     fn add(self, rhs: Vec2) -> Self {
-        Vec2 { x: self.x*rhs.x, y: self.y*rhs.y }
+        Vec2 { x: self.x+rhs.x, y: self.y+rhs.y }
     }
 }
 
