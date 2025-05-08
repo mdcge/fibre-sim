@@ -7,6 +7,11 @@ use vec2::Vec2;
 mod node;
 use node::Node;
 
+mod state;
+use state::State;
+
+mod utility;
+
 fn main() {
     nannou::app(model)
         .update(update)

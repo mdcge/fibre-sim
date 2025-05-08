@@ -3,13 +3,22 @@ use crate::vec2::Vec2;
 #[derive(Clone, Debug)]
 pub struct Node {
     pub r: Vec2,
-    v: Vec2,
+    pub v: Vec2,
     pub m: f32,
 }
 
 impl Node {
     pub fn new(pos: Vec2, vel: Vec2, mass: f32) -> Node {
         Node { r: pos, v: vel, m: mass }
+    }
+
+    pub fn update(&mut self, k_force: Vec2, g_force: Vec2, c_force: Vec2, dt: f32) {
+        let total_force = k_force + g_force + c_force;
+        let acc = total_force / self.m;
+        let vel = self.v + acc*dt;
+        let pos = self.r + vel*dt;
+        self.r = pos;
+        self.v = vel;
     }
 
     pub fn updated_node(&self, pre_node: &Node, post_node: &Node, g: f32, k: f32, x0: f32, c: f32, dt: f32) -> Node {
