@@ -14,15 +14,13 @@ impl State {
 
     pub fn step(&mut self, k: f32, x0: f32, g: f32, c: f32, dt: f32) {
         self.forces = vec![Vec2::new(0.0, 0.0); self.forces.len()];
-        let mut new_forces = self.forces.clone(); // seems redundant, but necessary for parallelization
 
         // Spring force
-        (0..self.nodes.len()-1).for_each(|i| {
-            let spring_force = spring_force(&self.nodes[i], &self.nodes[i+1], k, x0);
-            new_forces[i] += spring_force;
-            new_forces[i+1] -= spring_force;
+        (1..self.nodes.len()-1).for_each(|i| {
+            let pre_spring_force = spring_force(&self.nodes[i], &self.nodes[i-1], k, x0);
+            let post_spring_force = spring_force(&self.nodes[i], &self.nodes[i+1], k, x0);
+            self.forces[i] += pre_spring_force + post_spring_force;
         });
-        self.forces = new_forces;
 
         // Gravity and damping
         for i in 0..self.nodes.len() {
