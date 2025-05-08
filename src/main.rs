@@ -1,4 +1,5 @@
 use nannou::prelude::*;
+use std::time::Instant;
 
 mod vec2;
 use vec2::Vec2;
@@ -48,9 +49,23 @@ impl Simulation {
 impl Simulation {
     fn step(&mut self) {
         let mut new_node_list = self.nodes.clone();
-        for i in 1..self.nodes.len()-1 {
-            new_node_list[i] = self.nodes[i].updated_node(&self.nodes[i-1], &self.nodes[i+1], self.g, self.k*self.subdiv as f32, self.x0, self.c, self.dt);
-        }
+        let length = self.nodes.len();
+
+        let before = Instant::now();
+        // Iterator
+        let new_node_list = (0..length).into_iter()
+                                       .map(|i| {
+                                           if (i == 0) || (i == length-1) { self.nodes[i].clone() }
+                                           else { self.nodes[i].updated_node(&self.nodes[i-1], &self.nodes[i+1], self.g, self.k*self.subdiv as f32, self.x0, self.c, self.dt) }
+                                       })
+                                       .collect::<Vec<Node>>();
+
+        // For loop
+        // for i in 1..length-1 {
+        //     new_node_list[i] = self.nodes[i].updated_node(&self.nodes[i-1], &self.nodes[i+1], self.g, self.k*self.subdiv as f32, self.x0, self.c, self.dt);
+        // }
+        println!("Computation time: {:?}", before.elapsed());
+
         self.nodes = new_node_list;
     }
 
