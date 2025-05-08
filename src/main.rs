@@ -44,22 +44,20 @@ impl Simulation {
     }
 
     fn new_straight(x_endpoints: Vec<f32>, spring_constant: f32, grav: f32, damping: f32, fibre_length: f32, timestep: f32, node_diameter: f32, spring_thickness: f32, scale: f32, mass: f32, subd: usize) -> Simulation {
-        let spring_rest_length = fibre_length / subd as f32;
-        let k_per_node = spring_constant * subd as f32;
         let mut node_list = vec![];
         for i in 0..subd+1 {
             let x_pos = x_endpoints[0] + i as f32 * (x_endpoints[1] - x_endpoints[0]) / subd as f32;
             node_list.push(Node::new(Vec2 { x: x_pos, y: 0.0 }, Vec2 { x: 0.0, y: 0.0 }, mass/(subd as f32 + 1.0)));
         }
         let nb_nodes = node_list.len();
-        Simulation { simstate: State::new(node_list, vec![Vec2::new(0.0, 0.0); nb_nodes]), k: k_per_node, x0: spring_rest_length, g: grav, c: damping, L0: fibre_length, dt: timestep, n: subd, dn: node_diameter, ds: spring_thickness, s: scale }
+        Simulation { simstate: State::new(node_list, vec![Vec2::new(0.0, 0.0); nb_nodes]), k: spring_constant, x0: 0.0, g: grav, c: damping, L0: fibre_length, dt: timestep, n: subd, dn: node_diameter, ds: spring_thickness, s: scale }
     }
 }
 
 // Step
 impl Simulation {
     fn step(&mut self) {
-        self.simstate.step(self.k as f32, self.x0, self.g, self.c, self.dt);
+        self.simstate.step(self.k * self.n as f32, self.L0 / self.n as f32, self.g, self.c, self.dt);
     }
 
     fn get_lowest_point(&self) -> f32 {
