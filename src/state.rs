@@ -1,9 +1,9 @@
 use crate::vec2::Vec2;
 use crate::node::Node;
-use crate::utility::{spring_force_mag, gravity_force_mag};
+use crate::utility::{spring_force_mag, gravity_force_mag, damping_force_mag};
 
 pub struct State {
-    nodes: Vec<Node>,  // length: n
+    pub nodes: Vec<Node>,  // length: n
     spring_forces_mag: Vec<f32>,  // length: n-1
     gravity_forces_mag: Vec<f32>,  // length: n
     damping_forces_mag: Vec<f32>  // length: n
@@ -40,7 +40,7 @@ impl State {
 
     fn update_damping_forces(&mut self, c: f32) {
         for i in 0..self.nodes.len() {
-            self.gravity_forces_mag[i] = gravity_force_mag(&self.nodes[i], c);
+            self.damping_forces_mag[i] = damping_force_mag(&self.nodes[i], c);
         }
     }
 }

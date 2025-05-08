@@ -20,13 +20,13 @@ fn main() {
 }
 
 struct Simulation {
-    nodes: Vec<Node>,
+    simstate: State,  // simulation state
     k: f32,  // total spring constant (N/m)
     x0: f32,  // rest length of springs (m)
     g: f32,  // gravity (m/s^2)
     c: f32,  // damping coefficient
     dt: f32,  // time step size (s)
-    subdiv: usize,  // number of subdivisions (1 segment = 1 subdivision)
+    n: usize,  // number of subdivisions (1 segment = 1 subdivision)
     dn: f32,  // display size for nodes
     ds: f32,  // display size for springs
     s: f32,  // display scale
@@ -36,7 +36,8 @@ struct Simulation {
 impl Simulation {
     fn new(node_list: Vec<Node>, spring_constant: f32, rest_length: f32, grav: f32, damping: f32, timestep: f32, node_diameter: f32, spring_thickness: f32, scale: f32) -> Simulation {
         let s = node_list.len() - 1;
-        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, subdiv: s, dn: node_diameter, ds: spring_thickness, s: scale }
+        let nb_nodes = node_list.len();
+        Simulation { simstate: State::new(node_list, vec![0.0; nb_nodes-1], vec![0.0; nb_nodes], vec![0.0; nb_nodes]), k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, n: s, dn: node_diameter, ds: spring_thickness, s: scale }
     }
 
     fn new_straight(x_endpoints: Vec<f32>, spring_constant: f32, grav: f32, damping: f32, timestep: f32, node_diameter: f32, spring_thickness: f32, scale: f32, mass: f32, subd: usize) -> Simulation {
@@ -46,36 +47,20 @@ impl Simulation {
             let x_pos = x_endpoints[0] + i as f32 * (x_endpoints[1] - x_endpoints[0]) / subd as  f32;
             node_list.push(Node::new(Vec2 { x: x_pos, y: 0.0 }, Vec2 { x: 0.0, y: 0.0 }, mass/(subd as f32 + 1.0)));
         }
-        Simulation { nodes: node_list, k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, subdiv: subd, dn: node_diameter, ds: spring_thickness, s: scale }
+        let nb_nodes = node_list.len();
+        Simulation { simstate: State::new(node_list, vec![0.0; nb_nodes-1], vec![0.0; nb_nodes], vec![0.0; nb_nodes]), k: spring_constant, x0: rest_length, g: grav, c: damping, dt: timestep, n: subd, dn: node_diameter, ds: spring_thickness, s: scale }
     }
 }
 
 // Step
 impl Simulation {
     fn step(&mut self) {
-        let mut new_node_list = self.nodes.clone();
-        let length = self.nodes.len();
-
-        let before = Instant::now();
-        // Iterator
-        let new_node_list = (0..length).into_iter()
-                                       .map(|i| {
-                                           if (i == 0) || (i == length-1) { self.nodes[i].clone() }
-                                           else { self.nodes[i].updated_node(&self.nodes[i-1], &self.nodes[i+1], self.g, self.k*self.subdiv as f32, self.x0, self.c, self.dt) }
-                                       })
-                                       .collect::<Vec<Node>>();
-
-        // For loop
-        // for i in 1..length-1 {
-        //     new_node_list[i] = self.nodes[i].updated_node(&self.nodes[i-1], &self.nodes[i+1], self.g, self.k*self.subdiv as f32, self.x0, self.c, self.dt);
-        // }
-        println!("Computation time: {:?}", before.elapsed());
-
-        self.nodes = new_node_list;
+        self.simstate.update(self.k*self.n as f32, self.x0, self.g, self.c, self.dt);
     }
 
     fn get_lowest_point(&self) -> f32 {
-        self.nodes
+        self.simstate
+            .nodes
             .iter()
             .map(|x| x.r.y)
             .collect::<Vec<f32>>()
@@ -89,17 +74,17 @@ impl Simulation {
     fn render(&self, draw: &Draw, scale: f32) {
         draw.background().color(BLACK);
 
-        for (i, node) in self.nodes.iter().enumerate() {
+        for (i, node) in self.simstate.nodes.iter().enumerate() {
             draw.ellipse()
                 .color(WHITE)
                 .w(self.dn)
                 .h(self.dn)
                 .x_y(node.r.x*scale, node.r.y*scale);
-            if i != (self.nodes.len() - 1) {
+            if i != (self.simstate.nodes.len() - 1) {
                 draw.line()
                     .color(WHITE)
-                    .start(pt2(self.nodes[i].r.x*scale, self.nodes[i].r.y*scale))
-                    .end(pt2(self.nodes[i+1].r.x*scale, self.nodes[i+1].r.y*scale))
+                    .start(pt2(self.simstate.nodes[i].r.x*scale, self.simstate.nodes[i].r.y*scale))
+                    .end(pt2(self.simstate.nodes[i+1].r.x*scale, self.simstate.nodes[i+1].r.y*scale))
                     .weight(self.ds);
             }
         }
