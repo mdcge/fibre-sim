@@ -24,7 +24,7 @@ impl State {
 
         // Gravity and damping
         for i in 0..self.nodes.len() {
-            let gravity_force = self.nodes[i].m * g * Vec2::new(0.0, -1.0);
+            let gravity_force = self.nodes[i].m * Vec2::new(0.0, -g);
             let damping_force = -c * self.nodes[i].v;
             self.forces[i] += gravity_force + damping_force;
         }
