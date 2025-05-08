@@ -30,7 +30,6 @@ impl State {
         }
 
         // Integration
-        //for (node, force) in self.nodes.iter_mut().zip(&self.forces) {
         for i in 1..self.nodes.len()-1 {
             let acc = self.forces[i] / self.nodes[i].m;
             let vel = self.nodes[i].v + acc*dt;
