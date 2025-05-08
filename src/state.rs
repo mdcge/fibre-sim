@@ -17,11 +17,11 @@ impl State {
         let mut new_forces = self.forces.clone(); // seems redundant, but necessary for parallelization
 
         // Spring force
-        for i in 0..self.nodes.len()-1 {
+        (0..self.nodes.len()-1).for_each(|i| {
             let spring_force = spring_force(&self.nodes[i], &self.nodes[i+1], k, x0);
             new_forces[i] += spring_force;
             new_forces[i+1] -= spring_force;
-        }
+        });
         self.forces = new_forces;
 
         // Gravity and damping
