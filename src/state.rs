@@ -16,14 +16,14 @@ impl State {
         self.forces = vec![Vec2::new(0.0, 0.0); self.forces.len()];
 
         // Spring force
-        (1..self.nodes.len()-1).for_each(|i| {
+        for i in 1..self.nodes.len()-1 {
             let pre_spring_force = spring_force(&self.nodes[i], &self.nodes[i-1], k, x0);
             let post_spring_force = spring_force(&self.nodes[i], &self.nodes[i+1], k, x0);
             self.forces[i] += pre_spring_force + post_spring_force;
-        });
+        }
 
         // Gravity and damping
-        for i in 0..self.nodes.len() {
+        for i in 1..self.nodes.len()-1 {
             let gravity_force = self.nodes[i].m * Vec2::new(0.0, -g);
             let damping_force = -c * self.nodes[i].v;
             self.forces[i] += gravity_force + damping_force;
