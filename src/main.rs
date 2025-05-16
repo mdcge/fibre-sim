@@ -96,7 +96,7 @@ impl Simulation {
 
 fn model(_app: &App) -> Simulation {
     //                         x_endpoints      k       g      c     L0     dt      dn    ds    s      m    sub
-    Simulation::new_straight(vec![-2.0, 2.0], 5367.0, 9.81, 0.0002, 4.0, 0.000001, 10.0, 2.0, 400.0, 0.004, 200)
+    Simulation::new_straight(vec![-2.0, 2.0], 5000.0, 9.81, 0.0001, 4.0, 0.00001, 10.0, 2.0, 200.0, 0.003, 1000)
 }
 
 // `update` is like `event` except that the only event it triggers on is clock ticks
@@ -123,7 +123,7 @@ fn view(app: &App, simulation: &Simulation, frame: Frame) {
         .x_y(-win.wh()[0]/2.0 + 35.0, win.wh()[1]/2.0 - 10.0);
 
     let low_point = simulation.get_lowest_point() * 1000.0; // mm
-    draw.text(&format!("Sag = {:.0} {:0>3.0} {:0>3.0} nm", low_point - (low_point % 1.0), ((low_point*1000.0) % 1000.0).abs(), (low_point*1000000.0 % 1000.0).abs()).to_string())
+    draw.text(&format!("Sag = {:.0}.{:0>3.0} mm", low_point - (low_point % 1.0), ((low_point*1000.0) % 1000.0).abs()).to_string())
         .font_size(30)
         .width(win.wh()[0])
         .x_y(0.0, win.wh()[1]/2.0 - 50.0);
