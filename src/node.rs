@@ -15,9 +15,7 @@ impl Node {
     pub fn update(&mut self, k_force: Vec2, g_force: Vec2, c_force: Vec2, dt: f32) {
         let total_force = k_force + g_force + c_force;
         let acc = total_force / self.m;
-        let vel = self.v + acc*dt;
-        let pos = self.r + vel*dt;
-        self.r = pos;
-        self.v = vel;
+        self.v += acc*dt;
+        self.r += self.v*dt;
     }
 }
