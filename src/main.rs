@@ -65,9 +65,7 @@ impl Simulation {
             .nodes
             .iter()
             .map(|x| x.r.y)
-            .collect::<Vec<f32>>()
-            .iter()
-            .fold(f32::INFINITY, |this, that| f32::min(this, *that))
+            .fold(f32::INFINITY, f32::min)
     }
 }
 
