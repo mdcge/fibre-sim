@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 use crate::vec2::Vec2;
 use crate::node::Node;
 use crate::utility::spring_force;
@@ -23,7 +25,6 @@ impl State {
             self.forces[i] += pre_spring_force + post_spring_force;
         }
 
-        // Gravity and damping
         self.forces[1..length-1].iter_mut()
                                 .zip(&mut self.nodes[1..length-1])
                                 .for_each(|(force, node)| {
@@ -38,7 +39,5 @@ impl State {
                                     node.r = pos;
                                     node.v = vel;
                                 });
-
-        // Integration
     }
 }

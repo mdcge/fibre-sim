@@ -1812,6 +1812,7 @@ dependencies = [
  "nannou",
  "nannou_osc",
  "pretty_assertions",
+ "rayon",
 ]
 
 [[package]]

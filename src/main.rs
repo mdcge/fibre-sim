@@ -13,6 +13,8 @@ use state::State;
 mod utility;
 
 fn main() {
+    rayon::ThreadPoolBuilder::new().num_threads(8).build_global().unwrap();
+
     nannou::app(model)
         .update(update)
         .simple_window(view)
@@ -99,10 +101,14 @@ fn model(_app: &App) -> Simulation {
 
 // `update` is like `event` except that the only event it triggers on is clock ticks
 // Basically, it's a 60Hz update function.
-fn update(_app: &App, simulation: &mut Simulation, _update: Update) {
+fn update(app: &App, simulation: &mut Simulation, _update: Update) {
     let steps_per_frame = (1.0 / 60.0 / simulation.dt) as usize;
+    let before = Instant::now();
     for _ in 0..steps_per_frame {
         simulation.step();
+    }
+    if app.elapsed_frames() % 60 == 0 {
+        println!("Computation time: {:?}", before.elapsed());
     }
 }
 
