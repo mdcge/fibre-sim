@@ -30,8 +30,8 @@ struct Simulation {
     c: f32,  // damping coefficient
     L0: f32,  // rest length of fibre (m)
     dt: f32,  // time step size (s)
-    // Display parameters
     n: usize,  // number of subdivisions (1 segment = 1 subdivision)
+    // Display parameters
     dn: f32,  // display size for nodes
     ds: f32,  // display size for springs
     s: f32,  // display scale
