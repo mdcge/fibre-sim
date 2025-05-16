@@ -75,15 +75,16 @@ impl Simulation {
         draw.background().color(BLACK);
 
         for (i, node) in self.simstate.nodes.iter().enumerate() {
+            let (x, y) = (node.r.x*scale, node.r.y*scale);
             draw.ellipse()
                 .color(WHITE)
                 .w(self.dn)
                 .h(self.dn)
-                .x_y(node.r.x*scale, node.r.y*scale);
+                .x_y(x, y);
             if i != (self.simstate.nodes.len() - 1) {
                 draw.line()
                     .color(WHITE)
-                    .start(pt2(self.simstate.nodes[i].r.x*scale, self.simstate.nodes[i].r.y*scale))
+                    .start(pt2(x, y))
                     .end(pt2(self.simstate.nodes[i+1].r.x*scale, self.simstate.nodes[i+1].r.y*scale))
                     .weight(self.ds);
             }
