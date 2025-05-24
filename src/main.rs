@@ -1,4 +1,5 @@
 use std::time::Instant;
+use std_dev::standard_deviation;
 
 mod vec2;
 use vec2::Vec2;
@@ -12,9 +13,11 @@ use state::State;
 mod utility;
 
 fn main() {
-    let mut simulation = Simulation::new_straight(vec![-2.0, 2.0], 5000.0, 9.81, 0.0001, 4.0, 0.000005, 0.003, 1000);
+    let mut simulation = Simulation::new_straight(vec![-2.0, 2.0], 5000.0, 9.81, 0.0001, 4.0, 0.000005, 0.003, 2000);
+
     let total_steps = 1000000;
     let mut sag_history = vec![0.0; 20];
+    let std_dev_limit = 0.01;
 
     let before = Instant::now();
     for i in 0..total_steps {
@@ -22,6 +25,11 @@ fn main() {
         if (i+1) % 1000 == 0 {
             sag_history.rotate_right(1);
             sag_history[0] = simulation.get_lowest_point() * 1000.0;
+            let std_dev = standard_deviation(&sag_history).standard_deviation;
+            if std_dev < std_dev_limit {
+                println!("Standard deviation of {std_dev} dropped below {std_dev_limit}");
+                break
+            }
         }
         if (i+1) % 10000 == 0 {
             println!("Step {}/{total_steps}", i+1);
