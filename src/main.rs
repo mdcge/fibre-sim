@@ -15,15 +15,19 @@ use state::State;
 mod utility;
 
 fn main() {
+    // rayon::ThreadPoolBuilder::new().num_threads(1).build_global().unwrap();
+
     // Define simulation parameters
     let endpoints = vec![-2.0, 2.0];  // x coordinate of the endpoints
     let k = 5000.0;  // spring constant
     let g = 9.81;  // gravitational acceleration
     let c = 0.0001;  // damping constant
     let L0 = 4.0;  // fibre rest length
-    let dt = 0.000005;  // timestep
+    // let dt = 0.000005;  // timestep
     let mu = 0.003;  // mass per unit length
-    let n = 1000;  // subdivisions
+    let n = 3000;  // subdivisions
+    let omega = ((k * n as f32) / (mu * (L0/n as f32))).sqrt();  // oscillation frequency
+    let dt = 0.5 / omega;  // dynamically calculated timestep
     let mut simulation = Simulation::new_straight(endpoints, k, g, c, L0, dt, mu, n);
 
     // Define simulation metadata
