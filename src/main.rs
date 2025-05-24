@@ -12,17 +12,24 @@ use state::State;
 mod utility;
 
 fn main() {
-    rayon::ThreadPoolBuilder::new().num_threads(8).build_global().unwrap();
-
     let mut simulation = Simulation::new_straight(vec![-2.0, 2.0], 5000.0, 9.81, 0.0001, 4.0, 0.000005, 0.003, 1000);
+    let total_steps = 1000000;
+    let mut sag_history = vec![0.0; 20];
 
     let before = Instant::now();
-    for _ in 0..1000000 {
+    for i in 0..total_steps {
         simulation.step();
+        if (i+1) % 1000 == 0 {
+            sag_history.rotate_right(1);
+            sag_history[0] = simulation.get_lowest_point() * 1000.0;
+        }
+        if (i+1) % 10000 == 0 {
+            println!("Step {}/{total_steps}", i+1);
+        }
     }
     let time = before.elapsed();
 
-    let low_point = simulation.get_lowest_point() * 1000.0;
+    let low_point = sag_history[0];
     for node in simulation.simstate.nodes {
         println!("{:?}", node.r);
     }
