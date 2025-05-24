@@ -1,5 +1,7 @@
 use std::time::Instant;
 use std_dev::standard_deviation;
+use std::fs;
+use std::io::Write;
 
 mod vec2;
 use vec2::Vec2;
@@ -13,6 +15,7 @@ use state::State;
 mod utility;
 
 fn main() {
+    // Define simulation parameters
     let endpoints = vec![-2.0, 2.0];  // x coordinate of the endpoints
     let k = 5000.0;  // spring constant
     let g = 9.81;  // gravitational acceleration
@@ -23,37 +26,50 @@ fn main() {
     let n = 1000;  // subdivisions
     let mut simulation = Simulation::new_straight(endpoints, k, g, c, L0, dt, mu, n);
 
-    let total_steps = 1000000;
-    let mut sag_history = vec![0.0; 20];
-    let std_dev_limit = 0.01;
+    // Define simulation metadata
+    let max_steps = 10000000;
+    let mut sag_history = vec![0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0, 120.0, 130.0, 140.0, 150.0, 160.0, 170.0, 180.0, 190.0];
+    let std_dev_limit = 0.05;
+    let mut std_dev = standard_deviation(&sag_history).standard_deviation;
 
+    // Loop the simulation
     let before = Instant::now();
-    for i in 0..total_steps {
+    for i in 0..max_steps {
 
+        // Step
         simulation.step();
 
+        // Check sag stability
         if (i+1) % 1000 == 0 {
             sag_history.rotate_right(1);
             sag_history[0] = simulation.get_lowest_point() * 1000.0;
-
-            let std_dev = standard_deviation(&sag_history).standard_deviation;
+            std_dev = standard_deviation(&sag_history).standard_deviation;
             if std_dev < std_dev_limit {
                 println!("Standard deviation of {std_dev} dropped below {std_dev_limit}");
                 break
             }
         }
 
+        // Print progress
         if (i+1) % 10000 == 0 {
-            println!("Step {}/{total_steps}", i+1);
+            println!("Step {}/{max_steps}     sigma = {}", i+1, std_dev);
+            println!("dt = {dt}");
         }
     }
     let time = before.elapsed();
 
-    let low_point = sag_history[0];
+    // Write node positions to file
+    let mut file = fs::File::create("node_positions.txt").expect("Could not open file.");
     for node in simulation.simstate.nodes {
-        println!("{:?}", node.r);
+        file.write_all(&node.r.x.to_string().into_bytes()).expect("Could not write element to file.");
+        file.write_all(b",").expect("Could not write element to file.");
+        file.write_all(&node.r.y.to_string().into_bytes()).expect("Could not write element to file.");
+        file.write_all(b"\n").expect("Could not write element to file.");
     }
-    println!("Sag: {low_point} mm");
+
+    // Print simulation data
+    let low_point = sag_history[0];
+    println!("\nSag: {low_point} mm     (with sigma = {std_dev:.3})");
     println!("Computation time: {:?}", time);
 }
 
