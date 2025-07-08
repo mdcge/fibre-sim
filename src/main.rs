@@ -2,6 +2,7 @@ use std::time::Instant;
 use std_dev::standard_deviation;
 use std::fs;
 use std::io::Write;
+use std::f32::consts::PI;
 
 mod vec2;
 use vec2::Vec2;
@@ -17,12 +18,15 @@ mod utility;
 fn main() {
     // rayon::ThreadPoolBuilder::new().num_threads(1).build_global().unwrap();
 
+    // Define constants
+    const E: f32 = 2.64e9; // Pa
+    const A: f32 = PI * (0.001/2.0) * (0.001/2.0);
     // Define simulation parameters
     let endpoints = vec![-2.0, 2.0];  // x coordinate of the endpoints
-    let k = 5000.0;  // spring constant
     let g = 9.81;  // gravitational acceleration
     let c = 0.0001;  // damping constant
     let L0 = 4.0;  // fibre rest length
+    let k = E * A / L0;  // spring constant
     // let dt = 0.000005;  // timestep
     let mu = 0.003;  // mass per unit length
     let n = 3000;  // subdivisions
@@ -73,7 +77,7 @@ fn main() {
 
     // Print simulation data
     let low_point = sag_history[0];
-    println!("\nSag: {low_point} mm     (with sigma = {std_dev:.3})");
+    println!("\nSag: {low_point} mm     (with dt = {dt})");
     println!("Computation time: {:?}", time);
 }
 
