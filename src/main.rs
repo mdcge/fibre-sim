@@ -14,6 +14,7 @@ mod state;
 use state::State;
 
 mod utility;
+use utility::spring_force;
 
 fn main() {
     // rayon::ThreadPoolBuilder::new().num_threads(1).build_global().unwrap();
@@ -56,6 +57,11 @@ fn main() {
                 println!("Standard deviation of {std_dev} dropped below {std_dev_limit}");
                 break
             }
+
+            let f_left = spring_force(&simulation.simstate.nodes[0], &simulation.simstate.nodes[1], simulation.k*simulation.n as f32, simulation.x0);
+            let f_right = spring_force(&simulation.simstate.nodes[simulation.simstate.nodes.len() - 1], &simulation.simstate.nodes[simulation.simstate.nodes.len() - 2], simulation.k*simulation.n as f32, simulation.x0);
+            println!("Left end force: {:?}", (f_left.x*f_left.x + f_left.y*f_left.y).sqrt());
+            println!("Right end force: {:?}", (f_right.x*f_right.x + f_right.y*f_right.y).sqrt());
         }
 
         // Print progress
