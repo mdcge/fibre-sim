@@ -2,7 +2,7 @@ use std::time::Instant;
 use std_dev::standard_deviation;
 use std::fs;
 use std::io::Write;
-use std::f32::consts::PI;
+use std::f64::consts::PI;
 
 mod vec2;
 use vec2::Vec2;
