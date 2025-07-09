@@ -33,7 +33,7 @@ fn main() {
     let n = 3000;  // subdivisions
     let omega = ((k * n as f32) / (mu * (L0/n as f32))).sqrt();  // oscillation frequency
     let dt = 0.5 / omega;  // dynamically calculated timestep
-    let mut simulation = Simulation::new_straight(endpoints, k, g, c, L0, dt, mu, n);
+    let mut simulation = Simulation::new_straight(endpoints, k, g, c, L0, dt, mu*L0, n);
 
     // Define simulation metadata
     let max_steps = 10000000;
