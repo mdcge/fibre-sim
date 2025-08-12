@@ -13,8 +13,6 @@ use state::State;
 mod utility;
 
 fn main() {
-    rayon::ThreadPoolBuilder::new().num_threads(8).build_global().unwrap();
-
     nannou::app(model)
         .update(update)
         .simple_window(view)
