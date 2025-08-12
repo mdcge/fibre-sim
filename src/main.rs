@@ -2,7 +2,7 @@ use std::time::Instant;
 use std_dev::standard_deviation;
 use std::fs;
 use std::io::Write;
-use std::f64::consts::PI;
+use std::f32::consts::PI;
 
 mod vec2;
 use vec2::Vec2;
@@ -14,22 +14,22 @@ mod state;
 use state::State;
 
 mod utility;
-use utility::spring_force;
+use utility::{spring_force, force_is_stable, velocity_is_stable};
 
 fn main() {
     // rayon::ThreadPoolBuilder::new().num_threads(1).build_global().unwrap();
 
     // Define constants
-    const E: f32 = 2.64e9; // Pa
-    const A: f32 = PI * (0.001/2.0) * (0.001/2.0);
+    const E: f32 = 9.54e5; // Pa
+    const A: f32 = PI * (0.0013/2.0) * (0.0013/2.0);
     // Define simulation parameters
-    let endpoints = vec![-2.0, 2.0];  // x coordinate of the endpoints
+    let endpoints = vec![-0.47, 0.47];  // x coordinate of the endpoints
     let g = 9.81;  // gravitational acceleration
     let c = 0.0001;  // damping constant
-    let L0 = 4.0;  // fibre rest length
+    let L0 = 1.0;  // fibre rest length
     let k = E * A / L0;  // spring constant
     // let dt = 0.000005;  // timestep
-    let mu = 0.003;  // mass per unit length
+    let mu = 0.0012;  // mass per unit length
     let n = 3000;  // subdivisions
     let omega = ((k * n as f32) / (mu * (L0/n as f32))).sqrt();  // oscillation frequency
     let dt = 0.5 / omega;  // dynamically calculated timestep
@@ -58,16 +58,21 @@ fn main() {
                 break
             }
 
-            let f_left = spring_force(&simulation.simstate.nodes[0], &simulation.simstate.nodes[1], simulation.k*simulation.n as f32, simulation.x0);
-            let f_right = spring_force(&simulation.simstate.nodes[simulation.simstate.nodes.len() - 1], &simulation.simstate.nodes[simulation.simstate.nodes.len() - 2], simulation.k*simulation.n as f32, simulation.x0);
-            println!("Left end force: {:?}", (f_left.x*f_left.x + f_left.y*f_left.y).sqrt());
-            println!("Right end force: {:?}", (f_right.x*f_right.x + f_right.y*f_right.y).sqrt());
+            // velocity_is_stable(&simulation.simstate, 0.002);
+            // if force_is_stable(&simulation.simstate, 0.002) {
+            //     break
+            // }
+
+            // let f_left = spring_force(&simulation.simstate.nodes[0], &simulation.simstate.nodes[1], simulation.k as f32, simulation.x0);
+            // let f_right = spring_force(&simulation.simstate.nodes[simulation.simstate.nodes.len() - 1], &simulation.simstate.nodes[simulation.simstate.nodes.len() - 2], simulation.k as f32, simulation.x0);
+            // println!("Left end force: {:?}", (f_left.x*f_left.x + f_left.y*f_left.y).sqrt());
+            // println!("Right end force: {:?}", (f_right.x*f_right.x + f_right.y*f_right.y).sqrt());
         }
 
         // Print progress
         if (i+1) % 10000 == 0 {
+            println!("Sag: {}", sag_history[0]);
             println!("Step {}/{max_steps}     sigma = {}", i+1, std_dev);
-            println!("dt = {dt}");
         }
     }
     let time = before.elapsed();
